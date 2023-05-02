@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import InputTodo from "./InputTodo";
 import TodosList from "./TodosList";
+import { v4 as uuidv4 } from "uuid";
 
 const TodosLogic = () => {
   const [todos, setTodos] = useState(getInitialTodos());
@@ -17,36 +18,41 @@ const TodosLogic = () => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos])
 
-
-    //add item to todos
-    const addTodoItem = (title) => {
-      const newTodo = {
-        id: crypto.randomUUID(),
-        title: title,
-        completed: false,
-      };
-      setTodos([...todos, newTodo]);
-    }
+   //Toggle completed 
+  const handleChange = (id) => {
+    setTodos((prevState) =>
+      prevState.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            completed: !todo.completed,
+          };
+        }
+        return todo;
+      })
+    );
+  };
 
   //delete todo
   const delTodo = (id) => {
-    setTodos([...todos.filter((todo) => todo.id !== id )])
-  }
+    setTodos([
+      ...todos.filter((todo) => {
+        return todo.id !== id;
+      }),
+    ]);
+  }; 
+  
+  //add item to todos
+  const addTodoItem = (title) => {
+    const newTodo = {
+      id: uuidv4(),
+      title: title,
+      completed: false,
+    };
+    setTodos([...todos, newTodo]);
+  };  
 
-  //toggle completed 
-  const handleChange = (id) => {
-    setTodos((prevState) => prevState.map((todo) => {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          completed: !todo.completed
-        }
-      }
-      return todo
-    }))
-  }
-
-  // update edited todo
+   // update edited todo
   const setUpdate = (updatedTitle, id) => {
     setTodos(
       todos.map((todo) => {
@@ -55,17 +61,18 @@ const TodosLogic = () => {
         }
         return todo;
       })
-    )
-  }
+    );
+  };  
 
   return (
     <div>
-    <InputTodo addTodoItem={addTodoItem}/>
+    <InputTodo addTodoItem={addTodoItem} />
     <TodosList 
     todosProps={todos} 
-    handleChange={handleChange}
+    handleChange={handleChange} 
     delTodo={delTodo}
-    setUpdate={setUpdate}/>
+    setUpdate={setUpdate}
+    />
     </div>
   );
 };
